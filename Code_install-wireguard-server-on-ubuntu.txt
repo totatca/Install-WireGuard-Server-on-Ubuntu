@@ -1,0 +1,31 @@
+###
+# Replace :
+# 	- Range Address
+#	- ListenPort
+#	- PrivateKey
+#	- Network Interface Name
+	
+
+	wg genkey | tee privatekey | wg pubkey > publickey
+
+[Interface]
+## Address : A private IP address for wg0 interface.
+Address = 192.168.10.1/24
+ 
+## Specify the listening port of WireGuard, I like port 33333, you can change it.
+ListenPort = 33333
+ 
+## A privatekey of the server ( cat /etc/wireguard/privatekey)
+PrivateKey = PrivateKey_of_the_Server
+
+## The PostUp will run when the WireGuard Server starts the virtual VPN tunnel.
+## The PostDown rules run when the WireGuard Server stops the virtual VPN tunnel.
+## Specify the command that allows traffic to leave the server and give the VPN clients access to the Internet. 
+
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT
+
+PostUp = iptables -t nat -A POSTROUTING -o YOUR_Network_Interface_Name -j MASQUERADE
+
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+
+PostDown = iptables -t nat -D POSTROUTING -o YOUR_Network_Interface_Name -j MASQUERAD
